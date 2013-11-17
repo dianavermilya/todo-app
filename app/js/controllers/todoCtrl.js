@@ -9,6 +9,7 @@
 todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage, filterFilter) {
 	var promise = todoStorage.init();
 	$scope.todos = {};
+    var assignees = $scope.assignees = {};
 	promise.then(function (activeUser) {
 		var get = todoStorage.kinveyGet();
 		get.then(function (oldtodos) {
@@ -18,13 +19,13 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
 
         $scope.newTodo = '';
         $scope.editedTodo = null;
-
+     
+        $scope.$watch('assignees', true);
         $scope.$watch('todos', function (newValue, oldValue) {
                 $scope.remainingCount = filterFilter(todos, { completed: false }).length;
                 $scope.completedCount = todos.length - $scope.remainingCount;
                 $scope.allChecked = !$scope.remainingCount;
                 if (newValue !== oldValue) { // This prevents unneeded calls to the local storage
-                        todoStorage.put(todos);
                         console.log("watch was called. $scope.todos: ", todos);
                 }
         }, true);
@@ -51,7 +52,7 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
                 		_id: todoStorage.uuid(),
                         title: newTodoName,
                         completed: false,
-                        user: "John"
+                        assignee: "John"
                 	};
                 console.log("about to add a todo to scope.todos", todos);
                 todos.push(todo);
@@ -76,6 +77,7 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
                 $scope.originalTodo = angular.extend({}, todo);
         };
 
+
         $scope.doneEditing = function (todo) {
                 $scope.editedTodo = null;
                 todo.title = todo.title.trim();
@@ -92,8 +94,25 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
                 $scope.doneEditing($scope.originalTodo);
         };
 
-        $scope.changeUser = function (todo) {
-        	console.log(todo);
+        $scope.assign = function (todo) {
+            console.log("assign called");
+            $scope.editedAssigneeTodo = todo;
+            $scope.originalTodo = angular.extend({}, todo);
+            var me = {_id: "123213", name: "Diana"};
+
+            promise = todoStorage.kinveyAddAssignee(me).then (function (res) {
+                todoStorage.kinveyGetAssignees().then(function (response){
+                    console.log("kinvey assignees are:", response);
+                });
+            });
+            console.log($scope.assignees);
+        }
+
+        $scope.doneAssigning = function (todo) {
+            console.log("doneAssigning called");
+            $scope.editedAssignTodo = null;
+            todo.assignee = todo.assignee.trim();
+            todoStorage.kinveUpdate(todo);
         };
 
         $scope.removeTodo = function (todo) {

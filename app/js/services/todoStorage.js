@@ -25,13 +25,7 @@ todomvc.factory('todoStorage', function () {
 				});
 				return promise;
 			},
-            get: function () {
-                    return JSON.parse(localStorage.getItem(STORAGE_ID) || '[]');
-            },
 
-            put: function (todos) {
-                    localStorage.setItem(STORAGE_ID, JSON.stringify(todos));
-            },
 	        kinveyGet: function () {
 				var promise = Kinvey.DataStore.find('todos', null, {
 				    success: function(kinveyTodos) {
@@ -44,6 +38,18 @@ todomvc.factory('todoStorage', function () {
 				return promise;
 			},
 
+			kinveyGetAssignees: function () {
+				var promise = Kinvey.DataStore.find('assignees', null, {
+				    success: function(kinveyTodos) {
+				        console.log("get assignees from kinvey", kinveyTodos);
+				    },
+				    error: function(e) {
+				    	console.log("error", e);
+				    }
+				});
+				return promise;				
+			},
+
 			kinveySave: function (initPromise, todo) {
 				console.log("temp", todo);
 				var p = initPromise.then( function () {
@@ -53,7 +59,7 @@ todomvc.factory('todoStorage', function () {
 						_id : todo._id,
 						title: todo.title,
 						completed: todo.completed,
-						user: todo.user
+						assignee: todo.assignee
 					}, {
 					    success: function(response) {
 					        console.log("saved todo to Kinvey", response);
@@ -87,7 +93,7 @@ todomvc.factory('todoStorage', function () {
 				    _id  : todo._id,
 				   	title : todo.title,
 				    completed: todo.completed,
-				    user: todo.user
+				    assignee: todo.assignee
 				}, {
 				    success: function(response) {
 				        console.log("todo toggled: ", response);
@@ -98,6 +104,24 @@ todomvc.factory('todoStorage', function () {
 				});
 				return promise;
 			},
+
+			kinveyAddAssignee: function (assignee) {
+				console.log("this is the assignee we're about to add: ", assignee);
+
+				var promise = Kinvey.DataStore.save('assignees', {
+				    _id  : assignee._id,
+				   	name : assignee.name,
+				}, {
+				    success: function(response) {
+				        console.log("assignee added to kinvey: ", response);
+				    },
+				    error: function(e){
+				    	console.log ("error toggling todo: ", e);
+				    }
+				});
+				return promise;
+			},
+
 
 			kinveyClearCompleted: function () {
 				var query = new Kinvey.Query();

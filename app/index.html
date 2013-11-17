@@ -23,21 +23,23 @@
                         <div class="view">
                             <input class="toggle" type="checkbox" ng-model="todo.completed" ng-change="updateCompleted(todo)">
                             <label ng-dblclick="editTodo(todo)">{{todo.title}}</label>
-                            <label ng-dblclick="changeUser(todo)">{{todo.user}}</label>
+                            <label ng-dblclick="assign(todo)">{{todo.assignee}}</label>
                             <button class="destroy" ng-click="removeTodo(todo)"></button>
                         </div>
-                        <div>
-	                        <form ng-submit="doneEditing(todo)">
-	                            <input class="edit" ng-model="todo.title" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
-	                        </form>
-							<datalist id="myList">
-							  <select id="dummy">
-							    <input class="edit" ng-model="todo.user" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+                        <form ng-submit="doneEditing(todo)">
+                            <input class="edit" ng-model="todo.title" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+                        </form>
+                      
+                        <form ng-submit="doneAssignee(todo)">
+                            <input class="editAssignee" list = "assignees" ng-model="todo.assignee" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedAssignTodo">
+                        </form>
 
-							    <option ng-repeat="item in items" value="{{item}}"></option>
-							  </select>
-							</datalist>                          
-	                    <div>
+						<datalist id="assignees">
+						  <select id="dummy">
+						    <input class="edit" ng-model="$assignees">
+						    <option ng-repeat="item in items" value="{{item}}"></option>
+						  </select>
+						</datalist>                          
                     </li>
                 </ul>
             </section>
@@ -76,7 +78,6 @@
         <script src="js/services/todoStorage.js"></script>
         <script src="js/directives/todoFocus.js"></script>
         <script src="js/directives/todoBlur.js"></script>
-        <script src="js/directives/todoDropdown.js"></script>
         <script src="js/directives/todoEscape.js"></script>
         <script src="//da189i1jfloii.cloudfront.net/js/kinvey-html5-1.1.2.min.js"></script>
 	</body>
