@@ -30,7 +30,7 @@
                             <input class="edit" ng-model="todo.title" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
                         </form>
                       
-                        <form ng-submit="doneAssignee(todo)">
+                        <form ng-submit="doneAssigning(todo)">
                             <input class="editAssignee" list = "assignees" ng-model="todo.assignee" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedAssignTodo">
                         </form>
 

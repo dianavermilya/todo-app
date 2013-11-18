@@ -5,7 +5,6 @@
  * Services that persists and retrieves TODOs from localStorage
  */
 todomvc.factory('todoStorage', function () {
-        var STORAGE_ID = 'todos-angularjs';
 
         return {
 			init: function () {
@@ -87,7 +86,7 @@ todomvc.factory('todoStorage', function () {
 			},
 
 			kinveyUpdate: function (todo) {
-				console.log("this is the todo we're about to toggle: ", todo);
+				console.log("this is the todo we're about to update: ", todo);
 
 				var promise = Kinvey.DataStore.save('todos', {
 				    _id  : todo._id,
@@ -96,10 +95,10 @@ todomvc.factory('todoStorage', function () {
 				    assignee: todo.assignee
 				}, {
 				    success: function(response) {
-				        console.log("todo toggled: ", response);
+				        console.log("todo update: ", response);
 				    },
 				    error: function(e){
-				    	console.log ("error toggling todo: ", e);
+				    	console.log ("error updating todo: ", e);
 				    }
 				});
 				return promise;

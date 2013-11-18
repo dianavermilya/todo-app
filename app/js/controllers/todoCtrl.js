@@ -8,13 +8,26 @@
  */
 todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage, filterFilter) {
 	var promise = todoStorage.init();
-	$scope.todos = {};
-    var assignees = $scope.assignees = {};
+	var todos = $scope.todos = [];
+    var assignees = $scope.assignees = [];
 	promise.then(function (activeUser) {
+
+        var me = {_id: "123213", name: "Me"};
+        var p = todoStorage.kinveyAddAssignee(me).then (function (res) {
+            todoStorage.kinveyGetAssignees().then(function (response){
+                assignees = response;
+                console.log("kinvey assignees are:", response);
+                console.log("scope.assignees are", assignees)
+                return;
+            });
+            return;
+        });
+
 		var get = todoStorage.kinveyGet();
 		get.then(function (oldtodos) {
-			var todos = $scope.todos = oldtodos;
-			console.log("initial todos", $scope.todos);
+        for (var i=0;i<oldtodos.length;i++)
+            todos.push(oldtodos[i]);
+		console.log("initial todos", $scope.todos);
 
 
         $scope.newTodo = '';
@@ -52,7 +65,7 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
                 		_id: todoStorage.uuid(),
                         title: newTodoName,
                         completed: false,
-                        assignee: "John"
+                        assignee: "Me"
                 	};
                 console.log("about to add a todo to scope.todos", todos);
                 todos.push(todo);
@@ -98,13 +111,6 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
             console.log("assign called");
             $scope.editedAssigneeTodo = todo;
             $scope.originalTodo = angular.extend({}, todo);
-            var me = {_id: "123213", name: "Diana"};
-
-            promise = todoStorage.kinveyAddAssignee(me).then (function (res) {
-                todoStorage.kinveyGetAssignees().then(function (response){
-                    console.log("kinvey assignees are:", response);
-                });
-            });
             console.log($scope.assignees);
         }
 
@@ -112,7 +118,18 @@ todomvc.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage,
             console.log("doneAssigning called");
             $scope.editedAssignTodo = null;
             todo.assignee = todo.assignee.trim();
-            todoStorage.kinveUpdate(todo);
+            todoStorage.kinveyUpdate(todo);
+            var update = true
+            for (var i=0;i<assignees.length;i++) {
+                if (assignees[i].name == todo.assignee) update = false
+            }
+            if (update){
+                var newAssignee = {_id: todoStorage.uuid(), name: todo.assignee}
+                assignees.push(newAssignee);
+                todoStorage.kinveyAddAssignee(newAssignee);
+            }
+            console.log("from doneAssigning, assignees are:", assignees);
+
         };
 
         $scope.removeTodo = function (todo) {
