@@ -125,12 +125,25 @@ todomvc.factory('todoStorage', function () {
 			kinveyClearCompleted: function () {
 				var query = new Kinvey.Query();
 				query.equalTo('completed', true);
-				var promise = Kinvey.DataStore.clean('todos', null, {
+				var promise = Kinvey.DataStore.clean('todos', query, {
 				    success: function(response) {
 				        console.log("the completed tasks should have been deleted", response);
 				    },
 				    error: function(e) {
 				    	console.log("something went wrong with the clearing", e);
+				    }
+				});
+				return promise;
+			},
+
+			kinveyClearAssignees: function () {
+
+				var promise = Kinvey.DataStore.clean('assignees', null, {
+				    success: function(response) {
+				        console.log("the assignees list was cleared", response);
+				    },
+				    error: function(e) {
+				    	console.log("something went wrong with the clearing the assignees list", e);
 				    }
 				});
 				return promise;

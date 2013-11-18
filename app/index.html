@@ -23,23 +23,24 @@
                         <div class="view">
                             <input class="toggle" type="checkbox" ng-model="todo.completed" ng-change="updateCompleted(todo)">
                             <label ng-dblclick="editTodo(todo)">{{todo.title}}</label>
-                            <label ng-dblclick="assign(todo)">{{todo.assignee}}</label>
+                            <label ng-dblclick="assign(todo)" ng-show="todo != editedAssignTodo">{{todo.assignee}}</label>
                             <button class="destroy" ng-click="removeTodo(todo)"></button>
                         </div>
                         <form ng-submit="doneEditing(todo)">
                             <input class="edit" ng-model="todo.title" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
                         </form>
                       
-                        <form ng-submit="doneAssigning(todo)">
-                            <input class="editAssignee" list = "assignees" ng-model="todo.assignee" todo-escape="revertEditing(todo)" todo-blur="doneEditing(todo)" todo-focus="todo == editedAssignTodo">
+                        <form ng-submit="doneAssigning(todo)" ng-show="todo== editedAssignTodo">
+                            <input class="editAssignee" list = "assignees" ng-model="todo.assignee">
+                        <datalist id="assignees">
+                          <select>
+                            <option ng-repeat="assignee in assignees" value="{{assignee.name}}">
+                          </select>
+                        </datalist>    
                         </form>
 
-						<datalist id="assignees">
-						  <select id="dummy">
-						    <input class="edit" ng-model="$assignees">
-						    <option ng-repeat="item in items" value="{{item}}"></option>
-						  </select>
-						</datalist>                          
+
+                      
                     </li>
                 </ul>
             </section>
@@ -58,11 +59,16 @@
                         <a ng-class="{selected: location.path() == '/completed'}" href="#/completed">Completed</a>
                     </li>
                 </ul>
+                <div id="clear-btns">
                 <button id="clear-completed" ng-click="clearCompletedTodos()" ng-show="completedCount">Clear completed ({{completedCount}})</button>
+                <button id="clear-assignees" ng-click="clearAssignees()">Clear Assignees</button>
+
+                </div>
             </footer>
+
         </section>
+
         <footer id="info">
-            <p>Double-click to edit a todo</p>
             <p>Credits:
                 <a href="http://twitter.com/cburgdorf">Christoph Burgdorf</a>,
                 <a href="http://ericbidelman.com">Eric Bidelman</a>,
